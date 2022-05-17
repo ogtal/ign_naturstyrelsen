@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+sqlalchemy = "*"
+psycopg2 = "*"
+sqlalchemy-utils = "*"
+jupyterlab = "*"
+geoalchemy2 = "*"
+pandas = "*"
+geopandas = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.7"
