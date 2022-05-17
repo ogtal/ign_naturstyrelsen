@@ -17,6 +17,8 @@ create table raw_data (
     horizontal_accuracy FLOAT,
     altitude FLOAT,
     altitude_accuracy FLOAT,
+    manufacturer VARCHAR(256),
+    model VARCHAR(256),
     UtcDateTime_str VARCHAR(256),
     geo geometry(POINT)
 )
@@ -32,10 +34,10 @@ create table raw_2D_points (
     point_id SERIAL PRIMARY KEY, 
     aid VARCHAR(36),
     ts timestamp, 
-    latitude_D FLOAT, 
-    longitude_D FLOAT,
+    latitude FLOAT, 
+    longitude FLOAT,
     horizontal_accuracy FLOAT,
-    geo geometry(POINT)
+    geo geometry(POINT),
     FOREIGN KEY (aid) REFERENCES phone_info(aid)
 )
 
