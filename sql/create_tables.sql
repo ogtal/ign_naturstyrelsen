@@ -23,12 +23,14 @@ create table raw_data (
     geo geometry(POINT)
 )
 
+
 create table phone_info (
     aid VARCHAR(36) PRIMARY KEY,
     aid_type VARCHAR(10),
     manufacturer VARCHAR(256),
     model VARCHAR(256)
 )
+
 
 create table raw_2D_points (
     point_id SERIAL PRIMARY KEY, 
@@ -56,3 +58,39 @@ create table counter_data (
     FOREIGN KEY (device_id) REFERENCES counter_info(device_id)
 )
 
+#new table structure
+
+create table actor(
+    aid VARCHAR(36) PRIMARY KEY 
+)
+
+create table device(
+    device_id SERIAL PRIMARY KEY,
+    aid VARCHAR(36),
+    aid_type VARCHAR(10),
+    manufacturer VARCHAR(256),
+    model VARCHAR(256),
+    FOREIGN KEY (aid) REFERENCES actor(aid)
+)
+
+create table route (
+    route_id SERIAL PRIMARY KEY,
+    device_id INT,
+    start_ts timestamp,
+    end_ts timestamp,
+    avg_speed FLOAT,
+    duration FLOAT,
+    classification VARCHAR(256),
+    FOREIGN KEY (device_id) REFERENCES device(device_id)
+)
+
+create table point_2D (
+    point_id SERIAL PRIMARY KEY,
+    route_id INT, 
+    ts timestamp, 
+    latitude FLOAT, 
+    longitude FLOAT,
+    horizontal_accuracy FLOAT,
+    geo geometry(POINT),
+    FOREIGN KEY (route_id) REFERENCES route(route_id)
+)
