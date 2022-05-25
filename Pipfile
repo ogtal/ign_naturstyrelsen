@@ -11,6 +11,7 @@ jupyterlab = "*"
 geoalchemy2 = "*"
 pandas = "*"
 geopandas = "*"
+jupyter = "*"
 
 [dev-packages]
 
