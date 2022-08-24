@@ -1,4 +1,6 @@
---- Staging tabel 
+--- Dette script loader henholdsvis lokationsdata og vejnet data ind i tabellerne raw_data og infrastruktur, sætter SRID'er og indeksere relevante kolonner
+
+--- Staging tabel til lokationsdata
 drop table if exists raw_staging;
 
 create table raw_staging (
@@ -35,18 +37,16 @@ select id,
 	   manufacturer,
 	   model,
 	   utcdatetime_str from raw_staging rs 
-	   
-	   	   
+	   	   	   
 ALTER TABLE raw_data
 ADD geom geometry(POINT);
 
 UPDATE raw_data
 SET geom = ST_Point(longitude_D, latitude_D);
 
-
 -- følgende indexer er blot til at speed order by aid, ts en smule op
-DROP INDEX idx_raw_data_aid;
-drop index idx_raw_data_ts;
+DROP INDEX if exists idx_raw_data_aid;
+DROP INDEX if exists idx_raw_data_ts;
 
 CREATE INDEX idx_raw_data_aid 
 ON raw_data(aid);
@@ -54,9 +54,7 @@ ON raw_data(aid);
 CREATE INDEX idx_raw_data_ts 
 ON raw_data(ts);
 
-
 SELECT UpdateGeometrySRID('raw_data','geom',4326);
-
 --- Følgende laver tabellen infrastruktur, som bruges til at fjerne punkter senere hen:
 --- Først loades data ind i en staging tabel fra vores .shp filer:
 --- i terminalen konvertere vi .shp filerne til en .sql fil
@@ -66,30 +64,27 @@ SELECT UpdateGeometrySRID('raw_data','geom',4326);
 
 --- Laver infrastruktur tabel ud fra *_staging tabeller
 drop table if exists infrastruktur;
-
+  
 create table infrastruktur as
 select
-	st_union(infra.geom) as geom
-from
-	(
-	select
-		st_union(st_transform(js.geom,
-		4326)) as geom
-	from
-		jernbaner_staging js
+	st_transform(js.geom, 3044) as geom
+	from jernbaner_staging js
 union
-	select
-		st_union(st_transform(vs.geom,
-		4326)) as geom
-	from
-		vejgt6m_staging vs
+select	
+	st_transform(vs.geom, 3044) as geom
+	from vejgt6m_staging vs
 union
-	select
-		st_transform(ms.geom,
-		4326) as geom
-	from
-		motorvej_staging ms
-) as infra
+select st_transform(ms.geom, 3044) as geom
+	from motorvej_staging ms  
+  
+	
+CREATE INDEX point_geom_3044_idx
+  ON point
+  USING GIST (st_transform(geom, 3044));
+ 
+CREATE INDEX infrastruktur_geom_3044_idx
+  ON infrastruktur
+  USING GIST (st_transform(geom, 3044));
 
 
 
